@@ -133,7 +133,7 @@ def get_entities (ner_pipeline, text):
 entities_df  = get_entities (ner_model, sample_text)
 
 
-def show_html(annotated_text):
+def show_html(full_annotated_text):
 
     st.header("Named Entities ({})".format(ner_model))
     st.sidebar.header("Named Entities")
