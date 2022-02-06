@@ -21,16 +21,18 @@ HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; borde
 
 st.sidebar.image('https://nlp.johnsnowlabs.com/assets/images/logo.png', use_column_width=True)
 st.sidebar.header('Choose the pretrained model')
-select_model = st.sidebar.selectbox("",["ner_model_glove_100d"])
+select_model = st.sidebar.selectbox("select model name",["ner_model_glove_100d"])
+if select_model == "ner_model_glove_100d":
+    st.write("your choosed : er_model_glove_100d ")
 
 st.title("Spark NLP NER Model Playground")
 
 #data
-text1 = """On february 6th television viewers from 157 countries will tune in to the final of the Africa Cup of Nations, a biennial tournament featuring some of the world’s best footballers. In the first semi-final, Senegal beat Burkina Faso 3-1 in an entertaining match, marked by quick counter-attacks, occasionally sloppy passing and some excellent refereeing. The second semi-final was a much more tense affair with no goals in regular or extra time. Egypt eventually overcame Cameroon, the hosts, in a penalty shoot-out."""
-text2 = """The year is 2035. You are walking along the Bund, Shanghai’s storied waterfront, with two of your old classmates, pointing out how much has changed since the last time you were here 20 years ago. You almost joke about how the only thing that never changes is Xi Jinping being in power, but you think better of it. Someone might be listening. A message flashes in your glasses, and you say hurried goodbyes. The landscape of the Bund dissolves into the fantasy realm of a multiplayer game, where three friends in magical armour are waiting, swords at the ready."""
-text3 = """For many Haitians it felt wearily familiar. On January 24th a large earthquake hit the south-west part of the country, the second in the area in less than six months. The victims would of course need help, and the dysfunctional government of the western hemisphere’s poorest country was unlikely to provide much. But the prospect of yet more foreign aid workers descending on the place once dubbed the “Republic of ngos” did not inspire much enthusiasm either. They are “like vultures”, complains Monique Clesca, a journalist and activist: they live off disasters, but do little to improve things. It is a common view."""
-text4 = """The acronym stuck for a decade, no matter how bitterly the countries it lumped together moaned about it. Being branded one of the pigs—short for Portugal, Italy, Greece and Spain—as the euro teetered was to be the perennial butt of bond-market bullying, Eurocrat nagging and German tabloid contempt. But look today and the bloc’s Mediterranean fringe is doing rather well. Those once stuck in the muck in the aftermath of the global financial crisis are now flying high. Southern Europeans are running their countries with the competence and reformist zeal all too often lacking in their northern neighbours. It may be a flash in the pan. But if it endures, it will come to change the nature of the eu."""
-text5 = """With fanfare and fireworks, the Beijing 2022 Winter Olympic Games will begin on February 4th. But many officials will be missing from the opening ceremony. Countries including Britain, America and Australia are instigating a diplomatic boycott of the Games. They are wasting an opportunity to engage with their Chinese counterparts on the issues that matter to them."""
+text1 = """Barack Hussein Obama is the 44th President of the United States of America. He is currently serving his second term as President. Barack Obama is the first African-American to be elected President of the United States. Obama is a member of the Democratic Party. He was first elected in 2008 after a close race with Hilary Clinton. He was re-elected for a second time in 2012. Obama previously served as U.S Senator from Illinois."""
+text2 = """London is a famous and historic city. It is the capital of England in the United Kingdom. The city is quite popular for international tourism because London is home to one of the oldest-standing monarchies in the western hemisphere. Rita and Joanne recently traveled to London. They were very excited for their trip because this was their first journey overseas from the United States.Among the popular sights that Rita and Joanne visited are Big Ben, Buckingham Palace, and the London Eye. Big Ben is one of London’s most famous monuments. It is a large clock tower located at the northern end of Westminster Palace. The clock tower is 96 meters tall. Unfortunately, Rita and Joanne were only able to view the tower from the outside. """
+text3 = """In 1980, Apple Computer became a publicly-traded company, with a market value of $1.2 billion by the end of its very first day of trading. Jobs looked to marketing expert John Sculley of Pepsi-Cola to take over the role of CEO for Apple.The next several products from Apple suffered significant design flaws, however, resulting in recalls and consumer disappointment. IBM suddenly surpassed Apple in sales, and Apple had to compete with an IBM/PC-dominated business world.In 1984, Apple released the Macintosh, marketing the computer as a piece of a counterculture lifestyle: romantic, youthful, creative. But despite positive sales and performance superior to IBM's PCs, the Macintosh was still not IBM-compatible."""
+text4 = """Yesterday, Stephen returned from a trip to Washington, D.C., the capital of the United States. His visit took place during the week prior to the Fourth of July. Logically, there were many activities and celebrations in town in preparation for Independence Day. During his stay in the city, Stephen visited a lot of important historical sites and monuments, and he left with a deeper understanding of the political history of the United States.Stephen spent a lot of time outdoors exploring the important monuments surrounding Capitol Hill. Of course, he saw the White House from its outside gate at 1600 Pennsylvania Avenue. Stephen also visited the Washington Monument, the Jefferson Memorial, and the Lincoln Memorial. These statues and pavilions are dedicated to former U.S. presidents. They commemorate the contributions that these leaders made throughout American history. Washington, D.C. also has several war memorials dedicated to fallen soldiers during the major wars of the 20th century."""
+text5 = """Adolf Hitler was born on 20 April 1889. He was born in a town in Austria-Hungary. His birthplace is modern day Austria. His father Alois Hitler and mother Klara Pölzl moved to Germany when Adolf Hitler was 3 years old. Since childhood he was a German Nationalist. He sang the German national anthem with his friends. After the death of his father he lived a bohemian lifestyle. He worked as a painter in 1905. Vienna’s Academy of Fine Arts rejected Adolf Hitler"""
 
 sample_text = st.selectbox("",[text1, text2, text3,text4,text5])
 
@@ -129,3 +131,24 @@ def get_entities (ner_pipeline, text):
 
 
 entities_df  = get_entities (ner_model, sample_text)
+
+
+def show_html(annotated_text):
+
+    st.header("Named Entities ({})".format(sparknlp_model))
+    st.sidebar.header("Named Entities")
+
+    #st.write(annotated_text['ner'])
+    label_set = list(set([i.split('-')[1] for i in annotated_text['ner'] if i!='O']))
+
+    labels = st.sidebar.multiselect(
+            "Entity labels", options=label_set, default=list(label_set)
+        )
+        
+    html = get_onto_NER_html (annotated_text, labels) 
+        # Newlines seem to mess with the rendering
+    html = html.replace("\n", " ")
+    st.write(HTML_WRAPPER.format(html), unsafe_allow_html=True)
+
+    st.write('')
+    st.write('')
